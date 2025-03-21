@@ -17,12 +17,23 @@ WORKDIR /app
 # Clone the LibreChat repository (latest version)
 RUN git clone https://github.com/danny-avila/LibreChat.git .
 
+# Copy package files first for better layer caching
+RUN cp package*.json /tmp/
+WORKDIR /tmp
+RUN npm ci
+WORKDIR /app
+RUN cp -R /tmp/node_modules .
+
 # Copy our custom logo to replace the default one
 COPY assets/logo.svg /app/client/public/assets/logo.svg
 
-# Install dependencies and build the application
+# Build the frontend
+WORKDIR /app/client
 RUN npm install
 RUN npm run build
+
+# Return to main directory and prepare for serving
+WORKDIR /app
 
 # Expose port (default for LibreChat)
 EXPOSE 3080
