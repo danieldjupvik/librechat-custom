@@ -1,42 +1,38 @@
-FROM node:18-bullseye-slim
+FROM node:20-alpine
 
 # Label for GitHub container registry
 LABEL org.opencontainers.image.source=https://github.com/danieldjupvik/librechat-custom
 
 # Install required dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    python3 \
-    python3-pip \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk --no-cache add curl
 
-# Set working directory
+RUN mkdir -p /app && chown node:node /app
 WORKDIR /app
 
-# Clone the LibreChat repository (latest version)
-RUN git clone https://github.com/danny-avila/LibreChat.git .
+USER node
 
-# Copy package files first for better layer caching
-RUN cp package*.json /tmp/
-WORKDIR /tmp
-RUN npm ci
-WORKDIR /app
-RUN cp -R /tmp/node_modules .
+# Clone the LibreChat repository
+RUN apk --no-cache add git && \
+    git clone https://github.com/danny-avila/LibreChat.git . && \
+    apk del git
 
-# Copy our custom logo to replace the default one
-COPY assets/logo.svg /app/client/public/assets/logo.svg
+# Copy our custom logo over the default one
+COPY --chown=node:node assets/logo.svg /app/client/public/assets/logo.svg
 
-# Build the frontend
-WORKDIR /app/client
-RUN npm install
-RUN npm run build
-
-# Return to main directory and prepare for serving
-WORKDIR /app
+# Build the application following LibreChat's official process
+RUN touch .env && \
+    mkdir -p /app/client/public/images /app/api/logs && \
+    npm config set fetch-retry-maxtimeout 600000 && \
+    npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 15000 && \
+    npm install --no-audit && \
+    NODE_OPTIONS="--max-old-space-size=2048" npm run frontend && \
+    npm prune --production && \
+    npm cache clean --force
 
 # Expose port (default for LibreChat)
 EXPOSE 3080
+ENV HOST=0.0.0.0
 
-# Start the application
-CMD ["npm", "start"]
+# Start the application (backend only since frontend is pre-built)
+CMD ["npm", "run", "backend"]
