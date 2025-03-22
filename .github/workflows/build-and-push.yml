@@ -1,29 +1,44 @@
-name: Build and Push Custom LibreChat Image
+name: Build and Push LibreChat Image
 
+# Trigger daily at midnight UTC and on new releases (published) in this repo.
 on:
-  push:
-    branches: [main]
   schedule:
-    - cron: '0 0 * * *' # Daily build at midnight UTC; adjust as needed.
-
-permissions:
-  contents: read
-  packages: write
+    - cron: '0 0 * * *' # daily
+  release:
+    types: [published] # when a release is published
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read # allow cloning repos
+      packages: write # allow pushing to GHCR
     steps:
-      - name: Checkout code
+      # Step 1: Check out the current repository (contains your custom logo)
+      - name: Checkout this repository
         uses: actions/checkout@v3
 
-      - name: Build Docker Image
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/librechat-custom:latest .
+      # Step 2: Clone the LibreChat repository into a subfolder (e.g., "librechat")
+      - name: Checkout LibreChat repository
+        uses: actions/checkout@v3
+        with:
+          repository: danny-avila/LibreChat # LibreChat upstream repo
+          path: librechat # target directory for clone
 
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      # Step 3: Replace LibreChat's logo with your custom logo
+      - name: Replace logo with custom image
+        run: cp path/to/your/custom/logo.png librechat/client/public/assets/logo.png
 
-      - name: Push Image to GitHub Container Registry
+      # Step 4: Build the Docker image with the updated logo
+      - name: Build Docker image
+        working-directory: librechat
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/librechat-custom:latest .
+
+      # Step 5: Authenticate to GitHub Container Registry (GHCR)
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Step 6: Push the image to GHCR
+      - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository_owner }}/librechat-custom:latest
