@@ -28,7 +28,7 @@ jobs:
 
       # Step 3: Replace LibreChat's logo with your custom logo
       - name: Replace logo with custom image
-        run: cp assets/logo.png librechat/client/public/assets/logo.png
+        run: cp assets/logo.svg librechat/client/public/assets/logo.svg
 
       # Step 4: Build the Docker image with the updated logo
       - name: Build Docker image
