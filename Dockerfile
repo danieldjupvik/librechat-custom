@@ -7,11 +7,13 @@ FROM base as modify
 # Extract the original index.html
 RUN cp /app/client/dist/index.html /tmp/original-index.html
 
-# Use grep and basic shell commands that should be available by default
-RUN grep -v "<title>" /tmp/original-index.html > /tmp/temp1.html && \
-    awk '/<head>/ { print $0; print "    <title>Daniel AI Override</title>"; next }1' /tmp/temp1.html > /tmp/temp2.html && \
-    grep -v '<meta name="description"' /tmp/temp2.html > /tmp/temp3.html && \
-    awk '/<head>/ { print $0; print "    <meta name=\"description\" content=\"Daniel AI - We speak human (with a little AI magic)\" />"; next }1' /tmp/temp3.html > /tmp/modified-index.html
+# Use grep and shell commands to create a modified version
+RUN cat /tmp/original-index.html | \
+    grep -v "<title>" | \
+    grep -v '<meta name="description"' > /tmp/temp.html && \
+    sed -i '/<head>/a \    <title>Daniel AI Override</title>' /tmp/temp.html && \
+    sed -i '/<head>/a \    <meta name="description" content="Daniel AI - We speak human (with a little AI magic)" />' /tmp/temp.html && \
+    mv /tmp/temp.html /tmp/original-index.html
 
 # Final stage
 FROM base
