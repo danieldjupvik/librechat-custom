@@ -3,26 +3,20 @@ FROM ghcr.io/danny-avila/librechat-dev:latest as base
 
 # Create a temporary stage for modifications
 FROM base as modify
-# Switch to root user to install packages
-USER root
-
-# Install any tools needed for text processing if not already present
-RUN apk add --no-cache sed || true
 
 # Extract the original index.html
 RUN cp /app/client/dist/index.html /tmp/original-index.html
 
-# Modify the title and description using sed or shell commands
-RUN sed -i 's/<title>.*<\/title>/<title>Daniel AI Override<\/title>/' /tmp/original-index.html && \
-    sed -i 's/<meta name="description" content=".*"/<meta name="description" content="Daniel AI - We speak human (with a little AI magic)"/' /tmp/original-index.html
-
-# Switch back to node user for consistency
-USER node
+# Use grep and basic shell commands that should be available by default
+RUN grep -v "<title>" /tmp/original-index.html > /tmp/temp1.html && \
+    awk '/<head>/ { print $0; print "    <title>Daniel AI Override</title>"; next }1' /tmp/temp1.html > /tmp/temp2.html && \
+    grep -v '<meta name="description"' /tmp/temp2.html > /tmp/temp3.html && \
+    awk '/<head>/ { print $0; print "    <meta name=\"description\" content=\"Daniel AI - We speak human (with a little AI magic)\" />"; next }1' /tmp/temp3.html > /tmp/modified-index.html
 
 # Final stage
 FROM base
 # Copy the modified index.html from the modify stage
-COPY --from=modify /tmp/original-index.html /app/client/dist/index.html
+COPY --from=modify /tmp/modified-index.html /app/client/dist/index.html
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
