@@ -40,8 +40,9 @@ COPY --from=modify /tmp/modified-index.html /app/client/dist/index.html
 RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
 # Change temperature for title generation
 RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIClient.js
-# Use a minimal string replacement for the title instruction
-RUN sed -i 's/titleInstruction/\"Generate a short title with an emoji at the start\"/' /app/api/app/clients/OpenAIClient.js
+
+# Use the same approach but with complete instructions
+RUN sed -i 's/titleInstruction/\"Task: Generate a concise, 3-5 word title with a relevant emoji summarizing the chat history. Guidelines:\\n Start the title with one [EMOJI] that fits the topic (REQUIRED)\\n The [EMOJI] should help communicate the subject\\n Do NOT use quotes, punctuation, or markdown\\n Write the title in the chat\\\"s main language (default to English)\\n Prioritize clarity over creativity\\n Keep the title under 5 words\\n Output ONLY the title — no extra text, no explanations \\nExamples:\\n [CHART DECREASING EMOJI] Stock Market Trends\\n [COOKIE EMOJI] Perfect Chocolate Chip Recipe\\n [VIDEO GAME CONTROLLER EMOJI] Video Game Development Insights\\n [BRAIN EMOJI] Memory Optimization Techniques\\nThe chat to summarize:\"/' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
