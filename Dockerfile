@@ -11,4 +11,4 @@ COPY assets/icon-192x192.png /app/client/dist/assets/icon-192x192.png
 COPY assets/maskable-icon.png /app/client/public/assets/maskable-icon.png
 COPY assets/maskable-icon.png /app/client/dist/assets/maskable-icon.png
 COPY assets/manifest.webmanifest /app/client/dist/manifest.webmanifest
-COPY assets/index.html /app/client/dist/index.html
+# COPY assets/index.html /app/client/dist/index.html
