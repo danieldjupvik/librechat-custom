@@ -1,5 +1,6 @@
 FROM ghcr.io/danny-avila/librechat-dev:latest
 # Override the logo with your custom asset
+COPY assets/new_index.html /app/client/dist/index.html
 COPY assets/logo.svg /app/client/public/assets/logo.svg
 COPY assets/logo.svg /app/client/dist/assets/logo.svg
 COPY assets/favicon-16x16.png /app/client/public/assets/favicon-16x16.png
@@ -13,4 +14,4 @@ COPY assets/icon-192x192.png /app/client/dist/assets/icon-192x192.png
 COPY assets/maskable-icon.png /app/client/public/assets/maskable-icon.png
 COPY assets/maskable-icon.png /app/client/dist/assets/maskable-icon.png
 COPY assets/manifest.webmanifest /app/client/dist/manifest.webmanifest
-COPY assets/new_index.html /app/client/dist/index.html
+
