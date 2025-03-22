@@ -38,6 +38,8 @@ COPY --from=modify /tmp/modified-index.html /app/client/dist/index.html
 
 # Remove the max_tokens parameter from the title generation options
 RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
+# Change temperature for title generation
+RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIClient.js
 # Remove only the instruction text while preserving structure and spacing
 RUN sed -i 's/`Please generate ${titleInstruction}/`/' /app/api/app/clients/OpenAIClient.js
 
