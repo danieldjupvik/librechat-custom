@@ -11,7 +11,15 @@ RUN cp /app/client/dist/index.html /tmp/original-index.html
 RUN grep -v "<title>" /tmp/original-index.html > /tmp/temp1.html && \
     awk '/<head>/ { print $0; print "    <title>Daniel AI</title>"; next }1' /tmp/temp1.html > /tmp/temp2.html && \
     grep -v '<meta name="description"' /tmp/temp2.html > /tmp/temp3.html && \
-    awk '/<head>/ { print $0; print "    <meta name=\"description\" content=\"Daniel AI - We speak human (with a little AI magic)\" />"; next }1' /tmp/temp3.html > /tmp/modified-index.html
+    awk '/<head>/ { print $0; \
+                    print "    <meta name=\"description\" content=\"Daniel AI - We speak human (with a little AI magic)\" />"; \
+                    print "    <style>"; \
+                    print "      /* Hide the model icons in the sidebar */"; \
+                    print "      [data-testid=\"convo-item\"] > div:first-of-type {"; \
+                    print "        display: none !important;"; \
+                    print "      }"; \
+                    print "    </style>"; \
+                    next }1' /tmp/temp3.html > /tmp/modified-index.html
 
 # Final stage
 FROM base
