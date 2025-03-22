@@ -18,6 +18,11 @@ RUN grep -v "<title>" /tmp/original-index.html > /tmp/temp1.html && \
                     print "      [data-testid=\"convo-item\"] > div:first-of-type {"; \
                     print "        display: none !important;"; \
                     print "      }"; \
+                    print "      /* Adjust footer padding */"; \
+                    print "      div[role=\"contentinfo\"] {"; \
+                    print "        padding-top: 0.9rem !important;"; \
+                    print "        padding-bottom: 0.9rem !important;"; \
+                    print "      }"; \
                     print "    </style>"; \
                     next }1' /tmp/temp3.html > /tmp/modified-index.html
 
