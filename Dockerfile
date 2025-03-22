@@ -1,6 +1,9 @@
 # Start with the base image
 FROM ghcr.io/danny-avila/librechat-dev:latest as base
 
+# Set the APP_TITLE environment variable
+ENV APP_TITLE="Daniel AI"
+
 # Create a temporary stage for modifications
 FROM base as modify
 
@@ -15,6 +18,9 @@ RUN grep -v "<title>" /tmp/original-index.html > /tmp/temp1.html && \
 
 # Final stage
 FROM base
+# Set the APP_TITLE environment variable in the final stage too
+ENV APP_TITLE="Daniel AI"
+
 # Copy the modified index.html from the modify stage
 COPY --from=modify /tmp/modified-index.html /app/client/dist/index.html
 
