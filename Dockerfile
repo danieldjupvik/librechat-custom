@@ -21,7 +21,11 @@ RUN grep -v "<title>" /tmp/original-index.html > /tmp/temp1.html && \
                     print "      /* Adjust footer padding */"; \
                     print "      div[role=\"contentinfo\"] {"; \
                     print "        padding-top: 0.9rem !important;"; \
-                    print "        padding-bottom: 0.9rem !important;"; \
+                    print "        padding-bottom: 1rem !important;"; \
+                    print "      }"; \
+                    print "      /* Balance form padding */"; \
+                    print "      form.mx-auto.pl-2 {"; \
+                    print "        padding-right: 0.5rem"; \
                     print "      }"; \
                     print "    </style>"; \
                     next }1' /tmp/temp3.html > /tmp/modified-index.html
