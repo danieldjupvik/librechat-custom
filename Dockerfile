@@ -42,8 +42,8 @@ RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
 RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIClient.js
 # Remove only the instruction text while preserving structure and spacing
 RUN sed -i 's/`Please generate ${titleInstruction}/`/' /app/api/app/clients/OpenAIClient.js
-# Add emoji instruction at the end
-RUN sed -i 's/||>Title:`/||>Title: (include an emoji at the start)`/' /app/api/app/clients/OpenAIClient.js
+# Replace the entire content with custom emoji-focused instructions
+RUN sed -i 's|content: `Please generate ${titleInstruction}\n\n${convo}\n\n||>Title:`|content: `  ### Task:\n  Generate a concise, 3–5 word title with a relevant emoji summarizing the chat history.\n  ### Guidelines:\n  - Start the title with one emoji that fits the topic (REQUIRED)\n  - The emoji should help communicate the subject\n  - Do NOT use quotes, punctuation, or markdown\n  - Write the title in the chat'"'"'s main language (default to English)\n  - Prioritize clarity over creativity\n  - Keep the title under 5 words\n  - Output ONLY the title — no extra text, no explanations\n  ### Examples:\n  - 📉 Stock Market Trends\n  - 🍪 Perfect Chocolate Chip Recipe\n  - 🎮 Video Game Development Insights\n  - 🧠 Memory Optimization Techniques\n  \n  Chat History:\n\n${convo}\n\n||>Title:`|' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
