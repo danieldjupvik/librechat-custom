@@ -4,8 +4,8 @@ name: Build and Push Custom LibreChat Image
 on:
   schedule:
     - cron: '0 0 * * *' # daily
-  release:
-    types: [published] # when a release is published
+  # release:
+  #   types: [published] # when a release is published
 
 jobs:
   build-and-push:
