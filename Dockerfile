@@ -38,6 +38,8 @@ COPY --from=modify /tmp/modified-index.html /app/client/dist/index.html
 
 # Remove the max_tokens parameter from the title generation options
 RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
+# Change the title instruction to generate title
+RUN sed -i 's/`Please generate ${titleInstruction}/`Generate title/' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
