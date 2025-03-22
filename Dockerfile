@@ -3,15 +3,21 @@ FROM ghcr.io/danny-avila/librechat-dev:latest as base
 
 # Create a temporary stage for modifications
 FROM base as modify
+# Switch to root user to install packages
+USER root
+
 # Install any tools needed for text processing if not already present
-RUN apk add --no-cache sed
+RUN apk add --no-cache sed || true
 
 # Extract the original index.html
 RUN cp /app/client/dist/index.html /tmp/original-index.html
 
-# Modify the title and description using sed
+# Modify the title and description using sed or shell commands
 RUN sed -i 's/<title>.*<\/title>/<title>Daniel AI Override<\/title>/' /tmp/original-index.html && \
     sed -i 's/<meta name="description" content=".*"/<meta name="description" content="Daniel AI - We speak human (with a little AI magic)"/' /tmp/original-index.html
+
+# Switch back to node user for consistency
+USER node
 
 # Final stage
 FROM base
