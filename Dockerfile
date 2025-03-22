@@ -36,8 +36,8 @@ FROM base
 # Copy the modified index.html from the modify stage
 COPY --from=modify /tmp/modified-index.html /app/client/dist/index.html
 
-# Modify the max_tokens value for title generation with more precise matching
-RUN sed -i '/presence_penalty: 0,/,/max_tokens: 16/ s/max_tokens: 16/max_tokens: 1000/' /app/api/app/clients/OpenAIClient.js
+# Remove the max_tokens parameter from the title generation options
+RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
