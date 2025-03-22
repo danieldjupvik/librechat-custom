@@ -1,15 +1,16 @@
-name: Build and Push LibreChat Image
+name: Build and Push from source-code
 
-# Trigger daily at midnight UTC and on new releases (published) in this repo.
 on:
   schedule:
     - cron: '0 0 * * *' # daily
-  release:
-    types: [published] # when a release is published
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build-and-push:
+    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read # allow cloning repos
