@@ -42,6 +42,8 @@ RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
 RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIClient.js
 # Remove only the instruction text while preserving structure and spacing
 RUN sed -i 's/`Please generate ${titleInstruction}/`/' /app/api/app/clients/OpenAIClient.js
+# Add emoji instruction at the end
+RUN sed -i 's/||>Title:`/||>Title: (include an emoji at the start)`/' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
