@@ -41,7 +41,7 @@ RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
 # Change temperature for title generation
 RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIClient.js
 # Add emoji instructions after ${titleInstruction} but before ${convo}
-RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
+# RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
