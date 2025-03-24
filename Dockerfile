@@ -43,10 +43,10 @@ RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIC
 # Add emoji instructions after ${titleInstruction} but before ${convo}
 # RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
 
-# Append to titleInstruction for regular chats (keeping original text)
-RUN sed -i '/const titleInstruction =/,/;/ s/'\''[^'\'']*'\''/'\''& Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject'\''/g' /app/api/app/clients/prompts/titlePrompts.js
+# Fix for titleInstruction - add content before the closing quote with proper concatenation
+RUN sed -i '/const titleInstruction =/,/;/ s/'\''$/. Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject'\''/g' /app/api/app/clients/prompts/titlePrompts.js
 
-# Append to the LangChain template for agents (keeping original text)
+# Fix for LangChain template - this one was likely fine, just ensure indentation
 RUN sed -i '/Write a concise title for this conversation/a\\        Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.' /app/api/app/clients/prompts/titlePrompts.js
 
 # Override the logo with your custom asset
