@@ -42,8 +42,13 @@ RUN sed -i '/max_tokens: 16,/d' /app/api/app/clients/OpenAIClient.js
 RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIClient.js
 # Add emoji instructions after ${titleInstruction} but before ${convo}
 # RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
-RUN echo ". Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject." > /tmp/emoji_instructions.txt && \
-    sed -i "/const titleInstruction =/ s/'[^']*'/'&$(cat /tmp/emoji_instructions.txt)'/" /app/api/app/clients/OpenAIClient.js
+
+# Create a completely new replacement file with our modified titleInstruction
+RUN grep -B 100 "const titleInstruction =" /app/api/app/clients/OpenAIClient.js > /tmp/first_part.js && \
+    echo "const titleInstruction = 'a concise, 5-word-or-less title for the conversation, using its same language, with no punctuation. Apply title case conventions appropriate for the language. Never directly mention the language name or the word \"title\". Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.';" > /tmp/middle_part.js && \
+    grep -A 1000 -P "const titleInstruction =.*;" /app/api/app/clients/OpenAIClient.js | tail -n +2 > /tmp/last_part.js && \
+    cat /tmp/first_part.js /tmp/middle_part.js /tmp/last_part.js > /app/api/app/clients/OpenAIClient.js.new && \
+    mv /app/api/app/clients/OpenAIClient.js.new /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
