@@ -43,11 +43,15 @@ RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIC
 # Add emoji instructions after ${titleInstruction} but before ${convo}
 # RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
 
-# Fix for titleInstruction - add content before the closing quote with proper concatenation
-RUN sed -i '/const titleInstruction =/,/;/ s/'\''$/. Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject'\''/g' /app/api/app/clients/prompts/titlePrompts.js
+# Use exact pattern matching for titleInstruction - directly target the existing string
+RUN echo 'const modifiedTitleInstruction = '\''a concise, 5-word-or-less title for the conversation, using its same language, with no punctuation. Apply title case conventions appropriate for the language. Never directly mention the language name or the word "title". Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject'\'';' > /tmp/new_instruction.txt && \
+    grep -n "const titleInstruction =" /app/api/app/clients/prompts/titlePrompts.js | cut -d':' -f1 | xargs -I{} sed -i "{}s/const titleInstruction =/const titleInstruction =/; {}r /tmp/new_instruction.txt" /app/api/app/clients/prompts/titlePrompts.js && \
+    sed -i '/const modifiedTitleInstruction/d' /app/api/app/clients/prompts/titlePrompts.js && \
+    sed -i "s/const titleInstruction =.*/const titleInstruction = modifiedTitleInstruction;/" /app/api/app/clients/prompts/titlePrompts.js
 
-# Fix for LangChain template - this one was likely fine, just ensure indentation
-RUN sed -i '/Write a concise title for this conversation/a\\        Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.' /app/api/app/clients/prompts/titlePrompts.js
+# Use a more specific pattern match for the LangChain template
+RUN sed -i "/Title in 5 Words or Less/ i\\        Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject." /app/api/app/clients/prompts/titlePrompts.js
+
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
