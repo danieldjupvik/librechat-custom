@@ -43,12 +43,12 @@ RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIC
 # Add emoji instructions after ${titleInstruction} but before ${convo}
 # RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
 
-# Create a completely new replacement file with our modified titleInstruction
-RUN grep -B 100 "const titleInstruction =" /app/api/app/clients/OpenAIClient.js > /tmp/first_part.js && \
-    echo "const titleInstruction = 'a concise, 5-word-or-less title for the conversation, using its same language, with no punctuation. Apply title case conventions appropriate for the language. Never directly mention the language name or the word \"title\". Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.';" > /tmp/middle_part.js && \
-    grep -A 1000 -P "const titleInstruction =.*;" /app/api/app/clients/OpenAIClient.js | tail -n +2 > /tmp/last_part.js && \
-    cat /tmp/first_part.js /tmp/middle_part.js /tmp/last_part.js > /app/api/app/clients/OpenAIClient.js.new && \
-    mv /app/api/app/clients/OpenAIClient.js.new /app/api/app/clients/OpenAIClient.js
+# First, add a comment to identify where we want to add our instruction
+RUN sed -i '/const titleInstruction =/a\\/\/ ADD_EMOJI_INSTRUCTION_HERE' /app/api/app/clients/OpenAIClient.js && \
+    # Then use that comment to insert our script
+    sed -i '/ADD_EMOJI_INSTRUCTION_HERE/c\\const emojiInstruction = "Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.";\\n\/\/ We now use emojiInstruction in the content template below' /app/api/app/clients/OpenAIClient.js && \
+    # Replace the ${titleInstruction} reference in the content template
+    sed -i 's/\${titleInstruction}/\${titleInstruction}. \${emojiInstruction}/g' /app/api/app/clients/OpenAIClient.js
 
 # Override the logo with your custom asset
 # COPY assets/new_index.html /app/client/dist/index.html
