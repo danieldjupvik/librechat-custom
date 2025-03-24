@@ -43,11 +43,11 @@ RUN sed -i 's/temperature: 0.2,/temperature: 0.7,/' /app/api/app/clients/OpenAIC
 # Add emoji instructions after ${titleInstruction} but before ${convo}
 # RUN sed -i 's|\${titleInstruction}|\${titleInstruction} Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject.|' /app/api/app/clients/OpenAIClient.js
 
-# Direct replacement of titleInstruction with our modified version
-RUN sed -i "s/const titleInstruction =.*/const titleInstruction = 'a concise, 5-word-or-less title for the conversation, using its same language, with no punctuation. Apply title case conventions appropriate for the language. Never directly mention the language name or the word \"title\". Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject';/" /app/api/app/clients/prompts/titlePrompts.js
+# First command - Add to titleInstruction (specifically target the end of the string)
+RUN sed -i "s/word \"title\"/word \"title\". Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject/g" /app/api/app/clients/prompts/titlePrompts.js
 
-# Insert our emoji instruction before "Title in 5 Words or Less" in the LangChain template
-RUN sed -i "/Title in 5 Words or Less/ i\\        Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject." /app/api/app/clients/prompts/titlePrompts.js
+# Second command - Add our text to the template (insert between existing lines)
+RUN sed -i "/Write a concise title for this conversation/a\        Start the title with one emoji that fits the topic (REQUIRED), The emoji should help communicate the subject." /app/api/app/clients/prompts/titlePrompts.js
 
 
 # Override the logo with your custom asset
